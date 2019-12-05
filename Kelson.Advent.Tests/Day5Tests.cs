@@ -29,7 +29,7 @@ namespace Kelson.Advent.Tests
         }
 
         [Fact]
-        public void StoreOperationSetsValue()
+        public void ReadOperationSetsValue()
         {
             var input = new int[] { (int)Op.Read, 3, 99, 0 };
             var output = new int[] { (int)Op.Read, 3, 99, 12 };
