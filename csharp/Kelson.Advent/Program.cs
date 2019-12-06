@@ -9,6 +9,7 @@ using Day5Computer = Kelson.Advent.Day5.IntcodeComputer;
 using Kelson.Advent.Day3;
 using Kelson.Advent.Day4;
 using Kelson.Advent.Day5;
+using Kelson.Advent.Day6;
 
 namespace Kelson.Advent
 {
@@ -26,6 +27,7 @@ namespace Kelson.Advent
                 case 3: Day3(); break;
                 case 4: Day4(); break;
                 case 5: Day5(); break;
+                case 6: Day6(); break;
             }
         }
 
@@ -141,6 +143,18 @@ namespace Kelson.Advent
             copy = program.ToArray();
             Day5Computer.EvaluateProgram(copy, system);
             WriteLine(string.Join(",", device.Buffer));
+        }
+
+        static void Day6()
+        {
+            WriteLine("--- Day 6: Universal Orbit Map ---");
+            var map = "Day6/input.txt".ReadLines();
+            var orbit = Orbit.BuildOrbitMap(map);
+            var result = orbit.TotalOrbits();            
+            WriteLine(result);
+
+            var distance = orbit.TransfersBetween("YOU", "SAN");
+            WriteLine(distance);
         }
     }    
 }
