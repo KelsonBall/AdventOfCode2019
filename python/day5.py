@@ -3,7 +3,6 @@ def immediate(program_data, index):
     """Get a parameter value in immediate mode"""
     return program_data[index]
 
-
 def position(program_data, index):
     """Get a parameter value in position mode"""
     return program_data[program_data[index]]
@@ -59,8 +58,7 @@ def stopOperation(program_data, pointer, parameters, write, read):
 
 class Operand:
 
-    def __init__(self, identifier, parameter_count, mode_overrides, action):
-        self.identifier = identifier
+    def __init__(self, parameter_count, mode_overrides, action):        
         self.default_modes = mode_overrides
         self.parameter_count = parameter_count
         self.action = action
@@ -80,26 +78,27 @@ class Operand:
 
 
 operands = {
-    OP_Add: Operand(OP_Add, parameter_count=3, mode_overrides={2: immediate}, action=addOperation),
-    OP_Mult: Operand(OP_Mult, parameter_count=3, mode_overrides={2: immediate}, action=multOperation),
-    OP_Read: Operand(OP_Read, parameter_count=1, mode_overrides={0: immediate}, action=readOperation),
-    OP_Write: Operand(OP_Write, parameter_count=1, mode_overrides=None, action=writeOperation),
-    OP_JumpIfTrue: Operand(OP_JumpIfTrue, parameter_count=2, mode_overrides=None, action=jumpIfTrueOperation),
-    OP_JumpIfFalse: Operand(OP_JumpIfFalse, parameter_count=2, mode_overrides=None, action=jumpIfFalseOperation),
-    OP_LessThan: Operand(OP_LessThan, parameter_count=3, mode_overrides={2: immediate}, action=lessThanOperation),
-    OP_Equals: Operand(OP_Equals, parameter_count=3, mode_overrides={2: immediate}, action=equalsOperation),
-    OP_Stop: Operand(OP_Stop, parameter_count=0, mode_overrides=None, action=stopOperation),
+    OP_Add: Operand(parameter_count=3, mode_overrides={2: immediate}, action=addOperation),
+    OP_Mult: Operand(parameter_count=3, mode_overrides={2: immediate}, action=multOperation),
+    OP_Read: Operand(parameter_count=1, mode_overrides={0: immediate}, action=readOperation),
+    OP_Write: Operand(parameter_count=1, mode_overrides=None, action=writeOperation),
+    OP_JumpIfTrue: Operand(parameter_count=2, mode_overrides=None, action=jumpIfTrueOperation),
+    OP_JumpIfFalse: Operand(parameter_count=2, mode_overrides=None, action=jumpIfFalseOperation),
+    OP_LessThan: Operand(parameter_count=3, mode_overrides={2: immediate}, action=lessThanOperation),
+    OP_Equals: Operand(parameter_count=3, mode_overrides={2: immediate}, action=equalsOperation),
+    OP_Stop: Operand(parameter_count=0, mode_overrides=None, action=stopOperation),
 }
 
-
-def getModesAndOpCode(instruction):
+def get_modes_and_op_code(instruction):
     """
     Last two digits are OP code, all other digits indiciate mode flags
     Return (modes, OP)
     """
     as_text = str(instruction)
     code = int(as_text[-2:])
-    modes = [ immediate if flag == '1' else position for flag in as_text[:-2][-1::-1]]
+    mode_flags = as_text[:-2]
+    mode_flags_in_order = mode_flags[-1::-1]
+    modes = [ immediate if flag == '1' else position for flag in mode_flags_in_order ]
     return modes, code
 
 
@@ -111,7 +110,7 @@ def evaluate(program_data, read):
     read = read or []
     pointer = 0
     while pointer >= 0:
-        modes, op = getModesAndOpCode(program_data[pointer])
+        modes, op = get_modes_and_op_code(program_data[pointer])
         pointer = operands[op].evaluate(program_data, pointer, modes, write, read)
     return write
 
