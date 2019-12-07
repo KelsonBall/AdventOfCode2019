@@ -2,6 +2,7 @@
 {
     public interface Sys
     {
+        bool CanRead();
         void Write(int value);
         int Read();
     }

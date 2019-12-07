@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Kelson.Advent
@@ -34,5 +35,7 @@ namespace Kelson.Advent
                     yield break;
             }
         }
+        
+        public static Action<string> Log = s => { };        
     }
 }

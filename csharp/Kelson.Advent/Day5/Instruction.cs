@@ -3,15 +3,52 @@ using System.Linq;
 
 namespace Kelson.Advent.Day5
 {
+    public enum ProgramState
+    {
+        Running,
+        Halted,
+        Suspended,        
+    }
+
+    public readonly struct OpResult
+    {
+        public readonly int NextProgramPointer;
+        public readonly ProgramState State;
+
+        public OpResult(int next) => (NextProgramPointer, State) = (next, ProgramState.Running);
+
+        public OpResult(int next, ProgramState state) => (NextProgramPointer, State) = (next, state);
+
+        public static implicit operator OpResult(int next) => new OpResult(next);
+    }
+
     public readonly struct Instruction
     {
-        public delegate int Behavior(int pointer, Span<int> program, Sys system, int[] args);
+        public delegate OpResult Behavior(int pointer, Span<int> program, Sys system, int[] args);
 
         public readonly int InstructionPointer;
         public readonly Op Operation;
         public readonly Mode[] ParamModes;
         public readonly bool AnyImmediate => ParamModes.Any(m => m == Mode.Immediate);
         public readonly Behavior EvaluateOperation;
+
+        public string ToString(Span<int> program) => $"{Operation}({Arguments(program)})";
+
+        private string Arguments(Span<int> program)
+        {
+            int[] args = program.Slice(InstructionPointer + 1, ParamModes.Length).ToArray();
+            string[] parameters = new string[args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                int arg = args[i];
+                Mode mode = ParamModes[i];
+                if (mode == Mode.Immediate)
+                    parameters[i] = arg.ToString();
+                else
+                    parameters[i] = $"*{arg}: {program[arg]}";
+            }
+            return string.Join(", ", parameters);                
+        }
 
         public Instruction(int instructionPointer, Span<int> program)
         {
@@ -22,7 +59,7 @@ namespace Kelson.Advent.Day5
                 Op.Stop => Stop,
                 Op.Add => Add,
                 Op.Mult => Mult,
-                Op.Read => Store,
+                Op.Read => Read,
                 Op.Write => Write,
                 Op.JumpIfTrue => JumpIfTrue,
                 Op.JumpIfFalse => JumpIfFalse,
@@ -50,7 +87,7 @@ namespace Kelson.Advent.Day5
         }
 
 
-        public int Evaluate(Span<int> program, Sys system)
+        public OpResult Evaluate(Span<int> program, Sys system)
         {
             var args = program.Slice(InstructionPointer + 1, ParamModes.Length).ToArray();
             for (int i = 0; i < ParamModes.Length; i++)
@@ -63,33 +100,40 @@ namespace Kelson.Advent.Day5
             return EvaluateOperation(InstructionPointer, program, system, args);
         }
 
-        private static int Stop(int pointer, Span<int> program, Sys system, int[] args) => pointer;
+        private static OpResult Stop(int pointer, Span<int> program, Sys system, int[] args) => new OpResult(pointer, ProgramState.Halted);
 
-        private static int Add(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult Add(int pointer, Span<int> program, Sys system, int[] args)
         {
             program[args[2]] = args[0] + args[1];
             return pointer + args.Length + 1;
         }
 
-        private static int Mult(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult Mult(int pointer, Span<int> program, Sys system, int[] args)
         {
             program[args[2]] = args[0] * args[1];
             return pointer + args.Length + 1;
         }
 
-        private static int Store(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult Read(int pointer, Span<int> program, Sys system, int[] args)
         {
-            program[args[0]] = system.Read();
-            return pointer + args.Length + 1;
+            if (system.CanRead())
+            {
+                program[args[0]] = system.Read();
+                return pointer + args.Length + 1;
+            }
+            else
+            {
+                return new OpResult(pointer, ProgramState.Suspended);
+            }
         }
 
-        private static int Write(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult Write(int pointer, Span<int> program, Sys system, int[] args)
         {
             system.Write(args[0]);
             return pointer + args.Length + 1;
         }
 
-        private static int JumpIfTrue(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult JumpIfTrue(int pointer, Span<int> program, Sys system, int[] args)
         {
             if (args[0] != 0)
                 return args[1];
@@ -97,7 +141,7 @@ namespace Kelson.Advent.Day5
                 return pointer + args.Length + 1;
         }
 
-        private static int JumpIfFalse(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult JumpIfFalse(int pointer, Span<int> program, Sys system, int[] args)
         {
             if (args[0] == 0)
                 return args[1];
@@ -105,13 +149,13 @@ namespace Kelson.Advent.Day5
                 return pointer + args.Length + 1;
         }
 
-        private static int LessThan(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult LessThan(int pointer, Span<int> program, Sys system, int[] args)
         {            
             program[args[2]] = args[0] < args[1] ? 1 : 0;            
             return pointer + args.Length + 1;
         }
 
-        private static int Equals(int pointer, Span<int> program, Sys system, int[] args)
+        private static OpResult Equals(int pointer, Span<int> program, Sys system, int[] args)
         {
             program[args[2]] = args[0] == args[1] ? 1 : 0;
             return pointer + args.Length + 1;

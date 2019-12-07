@@ -2,6 +2,8 @@
 {
     public class NoOpSystem : Sys
     {
+        public bool CanRead() => false;
+
         public void Input(int value) { }
 
         public int Read() => default;

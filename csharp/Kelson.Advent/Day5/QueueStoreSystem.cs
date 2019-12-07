@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Kelson.Advent.Day5
@@ -6,18 +7,31 @@ namespace Kelson.Advent.Day5
     public class QueueStoreSystem : Sys
     {
         public readonly Queue<int> Log = new Queue<int>();
-        public readonly Queue<int> Inputs = new Queue<int>();        
+        public readonly Queue<int> Inputs = new Queue<int>();
 
-        public int Read() => Inputs.Dequeue();
+        public bool CanRead() => Inputs.Count > 0;
 
-        public void Write(int value) => Log.Enqueue(value);
+        public int Read()
+        {
+            var result = Inputs.Dequeue();
+            Console.WriteLine($">> read {result} from system");
+            return result;
+        }
+
+        public void Write(int value)
+        {
+            Console.WriteLine($">> writing {value} to system");
+            Log.Enqueue(value);
+        }
 
         private QueueStoreSystem() { }
 
         public class Device : Sys
-        {
+        {            
             private readonly QueueStoreSystem system;
             public Device(QueueStoreSystem system) => this.system = system;
+
+            public bool CanRead() => system.Log.Count > 0;
 
             public int Read() => system.Log.Dequeue();
 
@@ -33,6 +47,4 @@ namespace Kelson.Advent.Day5
             return (system, device);
         }
     }
-
-
 }

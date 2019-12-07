@@ -10,24 +10,34 @@ using Kelson.Advent.Day3;
 using Kelson.Advent.Day4;
 using Kelson.Advent.Day5;
 using Kelson.Advent.Day6;
+using Kelson.Advent.Day7;
 
 namespace Kelson.Advent
 {
     class Program
     {
-        static readonly string TODAY = DateTime.UtcNow.Day.ToString();
+        static readonly int TODAY = DateTime.UtcNow.Day;
 
         static void Main(string[] args)
         {
-            int day = int.Parse(args.FirstOrDefault() ?? TODAY);
-            switch (day)
+            if (args.Contains("log"))
+                Input.Log = Console.WriteLine;
+            
+            var days = new int[] { TODAY };
+            if (args.Contains("days"))
+                days = args.Where(a => char.IsDigit(a[0])).Select(int.Parse).OrderBy(i => i).ToArray();
+            foreach (var day in days)
             {
-                case 1: Day1(); break;
-                case 2: Day2(); break;
-                case 3: Day3(); break;
-                case 4: Day4(); break;
-                case 5: Day5(); break;
-                case 6: Day6(); break;
+                switch (day)
+                {
+                    case 1: Day1(); break;
+                    case 2: Day2(); break;
+                    case 3: Day3(); break;
+                    case 4: Day4(); break;
+                    case 5: Day5(); break;
+                    case 6: Day6(); break;
+                    case 7: Day7(); break;
+                }
             }
         }
 
@@ -155,6 +165,19 @@ namespace Kelson.Advent
 
             var distance = orbit.TransfersBetween("YOU", "SAN");
             WriteLine(distance);
+        }
+
+        static void Day7() 
+        {
+            WriteLine("");
+            var program = "Day7/input.txt".ReadLines().Single().Split(",").Select(int.Parse).ToArray();
+            WriteLine("Part 1: ");
+            var solver = new AmplifierSolver(program);
+            int max = solver.FindMaxOutput();
+            WriteLine(max);
+            WriteLine("Part 2: ");
+            int max2 = solver.FindMaxWithFeedback();
+            WriteLine(max2);
         }
     }    
 }
