@@ -52,7 +52,7 @@ def write_operation_outputs_value():
 
 write_operation_outputs_value()
 
-def writeOperationInImmediateModeOutputsValue():
+def write_operation_in_immediate_mode_outputs_value():
     input = [100 + OP_Write, 5, 99]
     output = [100 + OP_Write, 5, 99]
     read = []
@@ -60,74 +60,74 @@ def writeOperationInImmediateModeOutputsValue():
     assertListEquals(input, output)
     assert write[0] == 5
 
-writeOperationInImmediateModeOutputsValue()
+write_operation_in_immediate_mode_outputs_value()
 
-def addOperationInImmediateModeCorrectlySums():
+def add_operation_in_immediate_mode_correctly_sums():
     input = [1100 + OP_Add, 5, -2, 5, 99, 0]
     output = [1100 + OP_Add, 5, -2, 5, 99, 3]
     evaluate(input, [])
     assertListEquals(input, output)
 
-addOperationInImmediateModeCorrectlySums()
+add_operation_in_immediate_mode_correctly_sums()
 
-def addOperationInPartialImmediateModeCorrectlySums():
+def add_operation_in_partial_immediate_mode_correctly_sums():
     input = [1000 + OP_Add, 4, -2, 5, 99, 0]
     output = [1000 + OP_Add, 4, -2, 5, 99, 97]
     evaluate(input, [])
     assertListEquals(input, output)
 
-addOperationInPartialImmediateModeCorrectlySums()
+add_operation_in_partial_immediate_mode_correctly_sums()
 
 cases = [(4, 0), (8, 1), (9, 0)]
-def checkEqualTo8InPositionMode(input, output):
+def check_equal_to_8_in_position_mode(input, output):
     program = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, checkEqualTo8InPositionMode)
+run_test_for_cases(cases, check_equal_to_8_in_position_mode)
 
 cases = [(4, 1), (8, 0), (9, 0)]
-def checkLessThanTo8InPositionMode(input, output):
+def check_less_than_8_in_position_mode(input, output):
     program = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, checkLessThanTo8InPositionMode)
+run_test_for_cases(cases, check_less_than_8_in_position_mode)
 
 cases = [(4, 0), (8, 1), (9, 0)]
-def checkEqualTo8InImmediateMode(input, output):
+def check_equal_to_8_in_immediate_mode(input, output):
     program = [3, 3, 1108, -1, 8, 3, 4, 3, 99 ]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, checkEqualTo8InImmediateMode)
+run_test_for_cases(cases, check_equal_to_8_in_immediate_mode)
 
 cases = [(4, 1), (8, 0), (9, 0)]
-def checkLessThanTo8InImmediateMode(input, output):
+def check_less_than_8_in_immediate_mode(input, output):
     program = [3, 3, 1107, -1, 8, 3, 4, 3, 99 ]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, checkLessThanTo8InImmediateMode)
+run_test_for_cases(cases, check_less_than_8_in_immediate_mode)
 
 cases = [(0, 0), (1, 1), (9, 1)]
-def jumpTestInPositionMode(input, output):
+def jump_test_in_position_mode(input, output):
     program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9 ]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, jumpTestInPositionMode)
+run_test_for_cases(cases, jump_test_in_position_mode)
 
 cases = [(0, 0), (1, 1), (9, 1)]
-def jumpTestInImmediateMode(input, output):
+def jump_test_in_immediate_mode(input, output):
     program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1 ]    
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-run_test_for_cases(cases, jumpTestInImmediateMode)
+run_test_for_cases(cases, jump_test_in_immediate_mode)
 
 cases = [(4, 999), (8, 1000), (9, 1001)]
-def checkLtEqGt(input, output):
+def check_lt_eq_gt(input, output):
     program= [
         3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
         1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
@@ -136,4 +136,4 @@ def checkLtEqGt(input, output):
     assert len(write) == 1
     assert write[0] == output
 
-run_test_for_cases(cases, checkLtEqGt)
+run_test_for_cases(cases, check_lt_eq_gt)
