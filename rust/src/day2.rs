@@ -5,7 +5,7 @@ use std::io::{BufReader, BufRead};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ProgramState {
-    Running(usize),    
+    Running(usize),
     Suspended(usize),
     Error(ErrorState),
     Completed,
@@ -20,7 +20,7 @@ impl ProgramState {
     }
 
     fn program_pointer(&self) -> Option<usize> {
-        match *self { 
+        match *self {
             ProgramState::Running(pointer) => Some(pointer),
             ProgramState::Suspended(pointer) => Some(pointer),
             _ => None
@@ -34,7 +34,7 @@ pub enum ErrorState {
     InvalidOperandCode(i32),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum Parameter {
     Immediate(i32),
     Position(i32),
@@ -63,25 +63,29 @@ struct Operation {
 
 impl Operation {
     fn evaluate(&self, program : &mut Vec<i32>, pointer : usize) -> ProgramState {
-        (*self.behavior)(program, pointer, &self.params)        
+        (*self.behavior)(program, pointer, &self.params)
     }
 }
 
 fn add_op(program : &mut Vec<i32>, pointer : usize, parameters : &Vec<Parameter>) -> ProgramState {
-    let write_to = parameters[2].get_immediate();
+    let write_to = parameters[3].get_immediate();
     if write_to < 0 {
         return ProgramState::Error(ErrorState::InvalidPointerDereference(write_to))
     }
+
     program[write_to as usize] = parameters[1].get_from(program) + parameters[2].get_from(program);
+
     ProgramState::Running(pointer + parameters.len())
 }
 
 fn mult_op(program : &mut Vec<i32>, pointer : usize, parameters : &Vec<Parameter>) -> ProgramState {
-    let write_to = parameters[2].get_immediate();
+    let write_to = parameters[3].get_immediate();
     if write_to < 0 {
         return ProgramState::Error(ErrorState::InvalidPointerDereference(write_to))
     }
+
     program[write_to as usize] = parameters[1].get_from(program) * parameters[2].get_from(program);
+
     ProgramState::Running(pointer + parameters.len())
 }
 
@@ -94,24 +98,24 @@ fn invalid_op(_program : &mut Vec<i32>, _pointer : usize, parameters : &Vec<Para
 }
 
 fn read_next_operation(program : &mut Vec<i32>, pointer : usize) -> Operation {
-    match program[pointer] { 
-        1 => Operation { 
+    match program[pointer] {
+        1 => Operation {
                 behavior: Box::new(add_op),
-                params: vec![ 
-                    Parameter::Immediate(1), 
-                    Parameter::Immediate(program[pointer + 1]), 
-                    Parameter::Immediate(program[pointer + 2]), 
+                params: vec![
+                    Parameter::Immediate(1),
+                    Parameter::Position(program[pointer + 1]),
+                    Parameter::Position(program[pointer + 2]),
                     Parameter::Immediate(program[pointer + 3])]
             },
-        2 => Operation { 
+        2 => Operation {
                 behavior: Box::new(mult_op),
-                params: vec![ 
-                    Parameter::Immediate(2), 
-                    Parameter::Immediate(program[pointer + 1]), 
-                    Parameter::Immediate(program[pointer + 2]), 
+                params: vec![
+                    Parameter::Immediate(2),
+                    Parameter::Position(program[pointer + 1]),
+                    Parameter::Position(program[pointer + 2]),
                     Parameter::Immediate(program[pointer + 3])]
             },
-        99 => Operation { 
+        99 => Operation {
                 behavior: Box::new(stop_op),
                 params: vec![ Parameter::Immediate(99) ]
             },
@@ -142,7 +146,7 @@ pub fn evaluate(program: &mut Vec<i32>) -> ProgramState {
 
 pub fn run() {
     println!("--- Day 2: 1202 Program Alarm ---");
-    let text = 
+    let text =
         BufReader::new(
             File::open("resources/day2input.txt").unwrap())
                 .lines()
@@ -158,25 +162,24 @@ pub fn run() {
     let _ = evaluate(&mut memory);
     println!("Result >> {}", memory[0]);
 
-    println!("Finding maximum input combination:");
-    let mut max = memory[0];
+    let expected = 19690720;
+    println!("Finding inputs that evaluate to: {}", expected);
     for noun in 0..99 {
         for verb in 0..99 {
             memory = program.clone();
             memory[1] = noun;
             memory[2] = verb;
             let _ = evaluate(&mut memory);
-            if memory[0] > max {
-                max = memory[0];
+            if memory[0] == expected {
+                println!("Found inputs >> {}, {}", noun, verb);
+                return;
             }
         }
     }
-
-    println!("Maximum found input >> {}", max);
 }
 
 
-#[cfg(test)] 
+#[cfg(test)]
 mod test {
     use super::*;
 
@@ -191,8 +194,8 @@ mod test {
 
     #[test]
     fn test_mult_and_assign_to_empty() {
-        let mut program = vec![ 2, 3, 0, 0, 99 ];
-        let expected = vec![ 2, 3, 0, 6, 99 ];
+        let mut program = vec![ 2, 3, 0, 3, 99 ];
+        let expected =    vec![ 2, 3, 0, 6, 99 ];
         let result = evaluate(&mut program);
         assert_eq!(result, ProgramState::Completed);
         assert_eq!(program, expected);
