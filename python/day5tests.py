@@ -1,4 +1,4 @@
-from day5 import *
+from day5 import evaluate
 
 def assertListEquals(a, b):
     len_a, len_b = len(a), len(b)
@@ -7,35 +7,42 @@ def assertListEquals(a, b):
         assert a[i] == b[i], "Expect element at postion " + \
             str(i) + " to be " + str(b[i]) + " but found " + str(a[i])
 
-def runTestsForCases(cases, test):
+def run_test_for_cases(cases, test):
     for input, output in cases:
         test(input, output)
+
+OP_Add = 1
+OP_Mult = 2
+OP_Read = 3
+OP_Write = 4
+OP_JumpIfTrue = 5
+OP_JumpIfFalse = 6
+OP_LessThan = 7
+OP_Equals = 8
+OP_Stop = 99
 
 cases = [([1, 0, 0, 0, 99], [2, 0, 0, 0, 99]),
          ([2, 3, 0, 3, 99], [2, 3, 0, 6, 99]),
          ([2, 4, 4, 5, 99, 0], [2, 4, 4, 5, 99, 9801]),
          ([1, 1, 1, 4, 99, 5, 6, 0, 99], [30, 1, 1, 4, 2, 5, 6, 0, 99]),
          ([1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50], [3500, 9, 10, 70, 2, 3, 11, 0, 99, 30, 40, 50])]
-
-
-def day2ProgramsStillValid(input, output):
+def day_2_programs_still_valid(input, output):
     evaluate(input, [])
     assertListEquals(input, output)
 
-runTestsForCases(cases, day2ProgramsStillValid)
+run_test_for_cases(cases, day_2_programs_still_valid)
 
-def readOperationSetsValue():
+def read_operation_sets_value():
     input = [OP_Read, 3, 99, 0]
     output = [OP_Read, 3, 99, 12]
     read = []
     read.append(12)
-    write = evaluate(input, read)
+    evaluate(input, read)
     assertListEquals(input, output)
 
-readOperationSetsValue()
+read_operation_sets_value()
 
-
-def writeOperationOutputsValue():
+def write_operation_outputs_value():
     input = [OP_Write, 2, 99]
     output = [OP_Write, 2, 99]
     read = []
@@ -43,8 +50,7 @@ def writeOperationOutputsValue():
     assertListEquals(input, output)
     assert write[0] == 99
 
-writeOperationOutputsValue()
-
+write_operation_outputs_value()
 
 def writeOperationInImmediateModeOutputsValue():
     input = [100 + OP_Write, 5, 99]
@@ -56,11 +62,10 @@ def writeOperationInImmediateModeOutputsValue():
 
 writeOperationInImmediateModeOutputsValue()
 
-
 def addOperationInImmediateModeCorrectlySums():
     input = [1100 + OP_Add, 5, -2, 5, 99, 0]
     output = [1100 + OP_Add, 5, -2, 5, 99, 3]
-    write = evaluate(input, [])
+    evaluate(input, [])
     assertListEquals(input, output)
 
 addOperationInImmediateModeCorrectlySums()
@@ -68,7 +73,7 @@ addOperationInImmediateModeCorrectlySums()
 def addOperationInPartialImmediateModeCorrectlySums():
     input = [1000 + OP_Add, 4, -2, 5, 99, 0]
     output = [1000 + OP_Add, 4, -2, 5, 99, 97]
-    write = evaluate(input, [])
+    evaluate(input, [])
     assertListEquals(input, output)
 
 addOperationInPartialImmediateModeCorrectlySums()
@@ -79,7 +84,7 @@ def checkEqualTo8InPositionMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, checkEqualTo8InPositionMode)
+run_test_for_cases(cases, checkEqualTo8InPositionMode)
 
 cases = [(4, 1), (8, 0), (9, 0)]
 def checkLessThanTo8InPositionMode(input, output):
@@ -87,7 +92,7 @@ def checkLessThanTo8InPositionMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, checkLessThanTo8InPositionMode)
+run_test_for_cases(cases, checkLessThanTo8InPositionMode)
 
 cases = [(4, 0), (8, 1), (9, 0)]
 def checkEqualTo8InImmediateMode(input, output):
@@ -95,7 +100,7 @@ def checkEqualTo8InImmediateMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, checkEqualTo8InImmediateMode)
+run_test_for_cases(cases, checkEqualTo8InImmediateMode)
 
 cases = [(4, 1), (8, 0), (9, 0)]
 def checkLessThanTo8InImmediateMode(input, output):
@@ -103,7 +108,7 @@ def checkLessThanTo8InImmediateMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, checkLessThanTo8InImmediateMode)
+run_test_for_cases(cases, checkLessThanTo8InImmediateMode)
 
 cases = [(0, 0), (1, 1), (9, 1)]
 def jumpTestInPositionMode(input, output):
@@ -111,7 +116,7 @@ def jumpTestInPositionMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, jumpTestInPositionMode)
+run_test_for_cases(cases, jumpTestInPositionMode)
 
 cases = [(0, 0), (1, 1), (9, 1)]
 def jumpTestInImmediateMode(input, output):
@@ -119,7 +124,7 @@ def jumpTestInImmediateMode(input, output):
     write = evaluate(program, [ input ])
     assert write[0] == output
 
-runTestsForCases(cases, jumpTestInImmediateMode)
+run_test_for_cases(cases, jumpTestInImmediateMode)
 
 cases = [(4, 999), (8, 1000), (9, 1001)]
 def checkLtEqGt(input, output):
@@ -131,4 +136,4 @@ def checkLtEqGt(input, output):
     assert len(write) == 1
     assert write[0] == output
 
-runTestsForCases(cases, checkLtEqGt)
+run_test_for_cases(cases, checkLtEqGt)
