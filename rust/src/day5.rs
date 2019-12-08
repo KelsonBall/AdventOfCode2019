@@ -2,8 +2,6 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::VecDeque;
 
-// Written with knowledge of day 5 and 7 puzzles, my first day 2 solution was in csharp 😄
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ProgramState {
     Running(usize),
@@ -66,6 +64,7 @@ impl Parameter {
 }
 
 struct Operation {
+
     behavior: Box<dyn Fn(&mut Vec<i32>, usize, &Vec<Parameter>, &mut Sys) -> ProgramState>,
     params: Vec<Parameter>,
 }
@@ -109,7 +108,8 @@ impl Sys {
 fn add_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[3].get_pointer(program) {
         Ok(write_ptr) => {
-            program[write_ptr] = parameters[1].get_from(program) + parameters[2].get_from(program);
+            let (a, b) = (parameters[1].get_from(program), parameters[2].get_from(program));            
+            program[write_ptr] = a + b;
             ProgramState::Running(pointer + parameters.len())
         },
         Err(fail_state) => fail_state
@@ -119,7 +119,8 @@ fn add_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _
 fn mult_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[3].get_pointer(program) {
         Ok(write_ptr) => {
-            program[write_ptr] = parameters[1].get_from(program) * parameters[2].get_from(program);
+            let (a, b) = (parameters[1].get_from(program), parameters[2].get_from(program));            
+            program[write_ptr] = a * b;
             ProgramState::Running(pointer + parameters.len())
         },
         Err(fail_state) => fail_state
@@ -130,8 +131,8 @@ fn read_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, 
     match system.read() {
         Some(value) => {
             match parameters[1].get_pointer(program) {
-                Ok(write_ptr) => {
-                    program[write_ptr] = value;
+                Ok(write_ptr) => {                    
+                    program[write_ptr] = value;                                        
                     ProgramState::Running(pointer + parameters.len())
                 },
                 Err(fail_state) => fail_state
@@ -142,14 +143,15 @@ fn read_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, 
 }
 
 fn write_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, system: &mut Sys) -> ProgramState {
-    system.write(parameters[1].get_from(program));
+    let value = parameters[1].get_from(program);    
+    system.write(value);
     ProgramState::Running(pointer + parameters.len())
 }
 
 fn jump_if_true_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[1].get_from(program) {
         0 => ProgramState::Running(pointer + parameters.len()),
-        _ => match parameters[1].get_pointer(program) {
+        _ => match parameters[2].get_pointer(program) {            
             Ok(to_ptr) => ProgramState::Running(to_ptr),
             Err(fail_state) => fail_state
         }            
@@ -158,18 +160,19 @@ fn jump_if_true_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Para
 
 fn jump_if_false_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[1].get_from(program) {
-        0 => match parameters[1].get_pointer(program) {
+        0 => match parameters[2].get_pointer(program) {
             Ok(to_ptr) => ProgramState::Running(to_ptr),
             Err(fail_state) => fail_state
         },
-        _ => ProgramState::Running(pointer + parameters.len()),    
+        _ => ProgramState::Running(pointer + parameters.len()),
     }
 }
 
 fn lt_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[3].get_pointer(program) {
         Ok(write_ptr) => {
-            program[write_ptr] = if parameters[1].get_from(program) < parameters[2].get_from(program) { 1 } else { 0 };
+            let (a, b) = (parameters[1].get_from(program), parameters[2].get_from(program));
+            program[write_ptr] = if a < b { 1 }  else { 0 };
             ProgramState::Running(pointer + parameters.len())
         }
         Err(fail_state) => fail_state
@@ -179,7 +182,8 @@ fn lt_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _:
 fn eq_op(program: &mut Vec<i32>, pointer: usize, parameters: &Vec<Parameter>, _: &mut Sys) -> ProgramState {
     match parameters[3].get_pointer(program) {
         Ok(write_ptr) => {
-            program[write_ptr] = if parameters[1].get_from(program) == parameters[2].get_from(program) { 1 } else { 0 };
+            let (a, b) = (parameters[1].get_from(program), parameters[2].get_from(program));
+            program[write_ptr] = if a == b { 1 } else { 0 };
             ProgramState::Running(pointer + parameters.len())
         }
         Err(fail_state) => fail_state
@@ -196,11 +200,14 @@ fn invalid_op(_: &mut Vec<i32>, _: usize, parameters: &Vec<Parameter>, _: &mut S
     ))
 }
 
-fn parameter_from_mode_flags(mode_flag: i32, value: i32) -> Parameter {
-    if mode_flag & 1 == 1 {
-        Parameter::Immediate(value)
+fn parameter_from_mode_flags(mode_flag: i32, program: &mut Vec<i32>, pointer: usize, arg: usize) -> Parameter {
+    //println!("getting flags at position {} from {}", arg, mode_flag);
+    let immediate = ((mode_flag / 10i32.pow((arg + 1) as u32)) & 1) == 1;
+    //println!("is immediate? {}", immediate);
+    if immediate {
+        Parameter::Immediate(program[pointer + arg])
     } else {
-        Parameter::Position(value)
+        Parameter::Position(program[pointer + arg])
     }
 }
 
@@ -208,26 +215,66 @@ fn read_next_operation(program: &mut Vec<i32>, pointer: usize) -> Operation {
     let instruction = program[pointer];
     let mode_flags = (instruction / 100) * 100; // clear last 2 decimal digits
     let op_code = instruction - mode_flags;
-
+    
     match op_code {
         1 => Operation {
             behavior: Box::new(add_op),
             params: vec![
                 Parameter::Immediate(1),
-                parameter_from_mode_flags(mode_flags, program[pointer + 1]),
-                parameter_from_mode_flags(mode_flags / 10, program[pointer + 2]),
-                Parameter::Immediate(program[pointer + 3]),
-            ],
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2),
+                Parameter::Immediate(program[pointer + 3])],
         },
         2 => Operation {
             behavior: Box::new(mult_op),
             params: vec![
                 Parameter::Immediate(2),
-                parameter_from_mode_flags(mode_flags, program[pointer + 1]),
-                parameter_from_mode_flags(mode_flags / 10, program[pointer + 2]),
-                Parameter::Immediate(program[pointer + 3]),
-            ],
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2),
+                Parameter::Immediate(program[pointer + 3])],
         },
+        3 => Operation {
+            behavior: Box::new(read_op),
+            params: vec![
+                Parameter::Immediate(3),
+                Parameter::Immediate(program[pointer + 1])]
+        },
+        4 => Operation {
+            behavior: Box::new(write_op),
+            params: vec![
+                Parameter::Immediate(4),
+                parameter_from_mode_flags(mode_flags, program, pointer, 1)]
+        },
+        5 => Operation {
+            behavior: Box::new(jump_if_true_op),
+            params: vec![
+                Parameter::Immediate(5),
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2)],
+        }, 
+        6 => Operation {
+            behavior: Box::new(jump_if_false_op),
+            params: vec![
+                Parameter::Immediate(6),
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2)],
+        }, 
+        7 => Operation {
+            behavior: Box::new(lt_op),
+            params: vec![
+                Parameter::Immediate(7),
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2),
+                Parameter::Immediate(program[pointer + 3])],
+        },
+        8 => Operation {
+            behavior: Box::new(eq_op),
+            params: vec![
+                Parameter::Immediate(8),
+                parameter_from_mode_flags(mode_flags, program, pointer, 1),
+                parameter_from_mode_flags(mode_flags, program, pointer, 2),
+                Parameter::Immediate(program[pointer + 3])],
+        },    
         99 => Operation {
             behavior: Box::new(stop_op),
             params: vec![Parameter::Immediate(99)],
@@ -239,16 +286,19 @@ fn read_next_operation(program: &mut Vec<i32>, pointer: usize) -> Operation {
     }
 }
 
+// Execute a single operation on the program memory
 pub fn step(program: &mut Vec<i32>, state: &ProgramState, system: &mut Sys) -> ProgramState {
     match state.program_pointer() {
         Some(ip) => {
             let op = read_next_operation(program, ip);
+            // println!(">> {:?}@{}", op.params, ip);
             op.evaluate(program, ip, system)
         }
         None => state.clone(),
     }
 }
 
+// Execute the program until it reaches a non-running state
 pub fn evaluate(program: &mut Vec<i32>, system: &mut Sys) -> ProgramState {
     let mut state = ProgramState::Running(0);
     while state.is_running() {
@@ -266,10 +316,25 @@ pub fn run() {
         .expect("Could not read day2 input line");
 
     let program: &Vec<i32> = &(text.split(",").map(|i| i.parse().unwrap()).collect());
-    panic!("Not implemented");
-
+    println!("Part 1: AC diagnostics");    
+    let mut memory = program.clone();
     let mut system = Sys::new();
-    system.send(2);
+    system.send(1);
+    let _ = evaluate(&mut memory, &mut system);    
+    while match system.recieve() {
+        Some(result) => { 
+            print!(" {} ", result);
+            true
+        },
+        None => false
+    } {}  
+    println!();      
+    println!("Part 2: Thermal radiator diagnostics");    
+    let mut memory2 = program.clone();
+    let mut system2 = Sys::new();
+    system2.send(5);
+    let _ = evaluate(&mut memory2, &mut system2);    
+    println!("{}", system2.recieve().expect("Evaluation should send an output."));
 }
 
 #[cfg(test)]
