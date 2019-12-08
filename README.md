@@ -27,10 +27,14 @@ Progress:
 In the [prompts](prompts/) directory I hope to provide alternatives to the official puzzle prompts without the word-problem writing style, with references to coding and programing concepts the puzzles relate to, and with resources that students can use to learn more about those related topics.
 
 ### Week 1 prompts available:
-
 | Day 1 | Day 2 | Day 3 | Day 4 | Day 5 | Day 6 | Day 7 |
 |-------|-------|-------|-------|-------|-------|-------|
 | ✔    | ✔     |       |       |       |       |       |
+
+### Week 2 prompts available:
+| Day 8 | Day 9 | Day 10 | Day 11 | Day 12 | Day 13 | Day 14 |
+|-------|-------|--------|--------|--------|--------|--------|
+|       |       |        |        |        |        |        |
 
 # Solution Progress
 
@@ -43,4 +47,14 @@ In the [prompts](prompts/) directory I hope to provide alternatives to the offic
 | Python   |       |       |       |       | ✔     |       |       |
 | Rust     | ✔     | ✔    |       |       | ✔     |       |       |
 | Lua      |       |       |       |       |       |       |       |
+
+### Week 2
+
+| Language | Day 8 | Day 9 | Day 10 | Day 11 | Day 12 | Day 13 | Day 14 |
+|----------|-------|-------|--------|--------|--------|--------|--------|
+| C#       |       |       |        |        |        |        |        |
+| Kotlin   |       |       |        |        |        |        |        |
+| Python   |       |       |        |        |        |        |        |
+| Rust     |       |       |        |        |        |        |        |
+| Lua      |       |       |        |        |        |        |        |
 
