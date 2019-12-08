@@ -20,7 +20,6 @@ Progress:
 | C# | Kotlin | Python | Rust | Lua |
 |----|--------|--------|------|-----|
 | ✔  |        |        |      |     |
-|    |        |        |      |     |
 
 
 # Prompt Descriptions
