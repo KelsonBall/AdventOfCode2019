@@ -26,7 +26,13 @@ Progress:
 
 In the [prompts](prompts/) directory I hope to provide alternatives to the official puzzle prompts without the word-problem writing style, with references to coding and programing concepts the puzzles relate to, and with resources that students can use to learn more about those related topics.
 
-# Progress
+### Week 1 prompts available:
+
+| Day 1 | Day 2 | Day 3 | Day 4 | Day 5 | Day 6 | Day 7 |
+|-------|-------|-------|-------|-------|-------|-------|
+| ✔    | ✔     |       |       |       |       |       |
+
+# Solution Progress
 
 ### Week 1
 
