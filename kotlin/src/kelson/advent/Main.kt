@@ -5,6 +5,7 @@ fun runDayScript(day : Int)
     when (day) {
         1 -> kelson.advent.day1.run()
         2 -> kelson.advent.day2.run()
+        5 -> kelson.advent.day5.run()
     }
 }
 

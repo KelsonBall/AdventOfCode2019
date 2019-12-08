@@ -98,15 +98,17 @@ def evaluate(program_data, read):
         pointer = operands[op].evaluate(program_data, pointer, modes, write, read)
     return write
 
-if __name__ == "__main__":    
-    with open("./python/day5input.txt") as file:
+if __name__ == "__main__":
+    with open("../resources/day5/input.txt") as file:
         program = [ int(x) for x in file.readline().split(',') ]
     print("part 1:")
     copy = list(program)
     output = evaluate(copy, [1])
+    print(output)
     assert output[-1] == 4511442
 
     print("part 2:")
     copy = list(program)
     output = evaluate(copy, [ 5 ])
+    print(output)
     assert output[-1] == 12648139

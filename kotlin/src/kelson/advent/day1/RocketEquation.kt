@@ -8,8 +8,7 @@ fun fuelRequired(mass : Int) : Int = mass / 3 - 2
 
 fun moduleFuelRequirement(modules : Iterable<Int>) = modules.map{ fuelRequired(it) }.sum()
 
-fun totalFuelRequired(mass : Int) : Int 
-{
+fun totalFuelRequired(mass : Int) : Int {
     val fuelRequired = fuelRequired(mass)
     return if (fuelRequired <= 0)
         0
@@ -37,17 +36,15 @@ fun testPart2ForRecursiveFuelRequirements() =
     .forEach { (required, expected) -> assertEquals(required, expected) }
 
 
-fun runTests()
-{
+fun runTests() {
     println("Day 1:")
     runAsTest("Part 1", ::testPart1ForModuleFuelRequirements)
     runAsTest("Part 2", ::testPart2ForRecursiveFuelRequirements)
 }
 
-fun run()
-{
+fun run() {
     println("--- DDay 1: The Tyranny of the Rocket Equation ---")
-    val modules = File("src/kelson/advent/day1/input.txt").readLines().map(String::toInt)
+    val modules = File("../resources/day1/input.txt").readLines().map(String::toInt)
 
     println("Part 1 - Required fuel for modules:")
     val total = moduleFuelRequirement(modules)
