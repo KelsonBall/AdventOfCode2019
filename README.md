@@ -13,7 +13,7 @@ Your contributions are very welcome!
  
 # Prompt Descriptions
 
-In the [prompts](./prompts/) directory I hope to provide alternatives to the official puzzle prompts without the word-problem writing style, with references to coding and programing concepts the puzzles relate to, and with resources that students can use to learn more about those related topics.
+In the [prompts](prompts/) directory I hope to provide alternatives to the official puzzle prompts without the word-problem writing style, with references to coding and programing concepts the puzzles relate to, and with resources that students can use to learn more about those related topics.
 
 # Progress
 
