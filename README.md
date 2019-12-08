@@ -16,9 +16,11 @@ Your contributions are very welcome!
 Each language directory will contain a README that describes which tools to use, how the project is structured, and which commands to run to use the project.
 
 Progress:
+
 | C# | Kotlin | Python | Rust | Lua |
 |----|--------|--------|------|-----|
 | ✔  |        |        |      |     |
+
 
 # Prompt Descriptions
 
@@ -27,6 +29,7 @@ In the [prompts](prompts/) directory I hope to provide alternatives to the offic
 # Progress
 
 ### Week 1
+
 | Language | Day 1 | Day 2 | Day 3 | Day 4 | Day 5 | Day 6 | Day 7 |
 |----------|-------|-------|-------|-------|-------|-------|-------|
 | C#       | ✔     | ✔    | ✔     | ✔    | ✔     | ✔    | ✔     |
