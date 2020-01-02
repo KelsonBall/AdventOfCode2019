@@ -23,11 +23,3 @@ function readLines(filename)
         end
     end
 end
-
-function mapToTable(self, transform)        
-    local result = {}
-    for value in self do
-        result[#result + 1] = transform(value)
-    end
-    return result
-end
