@@ -46,7 +46,7 @@ In the [prompts](prompts/) directory I hope to provide alternatives to the offic
 | Kotlin   | ✔     | ✔    |       |       | ✔     |       |       |
 | Python   |       |       |       |       | ✔     | 🟡    |       |
 | Rust     | ✔     | ✔    |       |       | ✔     |       |       |
-| Lua      |       |       |       |       |       |       |       |
+| Lua      | ✔     |       |       |       |       |       |       |
 
 ### Week 2
 
