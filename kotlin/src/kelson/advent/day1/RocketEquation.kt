@@ -10,10 +10,11 @@ fun moduleFuelRequirement(modules : Iterable<Int>) = modules.map{ fuelRequired(i
 
 fun totalFuelRequired(mass : Int) : Int {
     val fuelRequired = fuelRequired(mass)
-    return if (fuelRequired <= 0)
+    return if (fuelRequired <= 0) {
         0
-    else
+    } else {
         fuelRequired + totalFuelRequired(fuelRequired)
+    }
 }
 
 fun totalModuleFuelRequirement(modules : Iterable<Int>) = modules.map{ totalFuelRequired(it) }.sum()
@@ -43,7 +44,7 @@ fun runTests() {
 }
 
 fun run() {
-    println("--- DDay 1: The Tyranny of the Rocket Equation ---")
+    println("--- Day 1: The Tyranny of the Rocket Equation ---")
     val modules = File("../resources/day1/input.txt").readLines().map(String::toInt)
 
     println("Part 1 - Required fuel for modules:")
