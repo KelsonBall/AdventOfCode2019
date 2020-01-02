@@ -1,4 +1,5 @@
-local utils = require "util"
+require "test"
+require "util"
 
 local function sum(table, scoreOf)
     local sum = 0
@@ -30,7 +31,7 @@ local function totalModuleFuelRequirement(modules)
 end
 
 local function test()
-    utils.doTests{
+    doTests{
         ["Base fuel requirement"] = {
             { { 12, 2 }, { 14, 2 }, {1969, 654 }, { 100756, 33583 } },
             function (_, mass, fuel) 
@@ -43,13 +44,15 @@ local function test()
                 assert(totalFuelRequired(mass) == fuel)
             end
         }
-    }    
+    }
 end
 
 local modules = {}
 
 local function load()
-    modules = utils.mapToTable(utils.readLines("../resources/day1/input.txt"), tonumber)    
+    for line in readLines("../resources/day1/input.txt") do
+        table.insert(modules, line)
+    end
 end
 
 local function runDay1()    
