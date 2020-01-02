@@ -44,7 +44,7 @@ In the [prompts](prompts/) directory I hope to provide alternatives to the offic
 |----------|-------|-------|-------|-------|-------|-------|-------|
 | C#       | ✔     | ✔    | ✔     | ✔    | ✔     | ✔    | ✔     |
 | Kotlin   | ✔     | ✔    |       |       | ✔     |       |       |
-| Python   |       |       |       |       | ✔     |       |       |
+| Python   |       |       |       |       | ✔     | 🟡    |       |
 | Rust     | ✔     | ✔    |       |       | ✔     |       |       |
 | Lua      |       |       |       |       |       |       |       |
 
