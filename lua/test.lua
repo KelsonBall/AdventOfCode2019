@@ -20,12 +20,13 @@ local function runComplexTest(test)
     local cases, method = table.unpack(test)
 
     for index,data in ipairs(cases) do
-        ran = ran + 1                
-        if pcall(getInvocationFunction(method, index, data)) then
+        ran = ran + 1
+        local result, error = pcall(getInvocationFunction(method, index, data))
+        if result then
             pass = pass + 1
             table.insert(results, "  case " .. index .. ": ✔")
         else
-            table.insert(results, "  case " .. index .. ": ❌")
+            table.insert(results, "  case " .. index .. ": ❌ (" .. error .. ")")
         end
     end
 
@@ -58,4 +59,13 @@ function doTests(test_data)
     else
         print("Passed " .. pass .. "/" .. ran .. " ❌")
     end
+end
+
+function assertTableEquals(a, b)
+    for k,v in pairs(a) do
+        if a[k] ~= b[k] then
+            return false
+        end
+    end
+    return true
 end

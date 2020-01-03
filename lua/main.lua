@@ -1,5 +1,6 @@
 local days = {
-    require "day1"
+    require "day1",
+    require "day2"
 }
 
 function flag(name)

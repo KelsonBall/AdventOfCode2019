@@ -23,3 +23,11 @@ function readLines(filename)
         end
     end
 end
+
+function flatCopy(table)
+    local result = {}
+    for k,v in pairs(table) do
+        result[k] = v
+    end
+    return result
+end
